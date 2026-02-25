@@ -289,8 +289,12 @@ class SwitcherPanel: NSPanel {
 
     func launchSelected() {
         guard let app = resultsView.selectedApp else { return }
+        let url = URL(fileURLWithPath: app.path)
         hide()
-        NSWorkspace.shared.open(URL(fileURLWithPath: app.path))
+        DispatchQueue.main.async {
+            let config = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.openApplication(at: url, configuration: config)
+        }
     }
 
     // Allow Escape to close
