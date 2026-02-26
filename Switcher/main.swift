@@ -324,8 +324,12 @@ class SwitcherPanel: NSPanel {
         hide()
     }
 
-    // Keep panel key when clicking outside
     override var canBecomeKey: Bool { true }
+
+    override func resignKey() {
+        super.resignKey()
+        hide()
+    }
 }
 
 // MARK: - Data Model
