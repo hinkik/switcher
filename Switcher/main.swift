@@ -205,6 +205,19 @@ class SwitcherPanel: NSPanel {
             }
         }
 
+        // Add system apps not in standard directories
+        let extraApps = [
+            "/System/Library/CoreServices/Finder.app",
+        ]
+        for path in extraApps {
+            if fm.fileExists(atPath: path) {
+                let name = ((path as NSString).lastPathComponent as NSString).deletingPathExtension
+                let icon = NSWorkspace.shared.icon(forFile: path)
+                icon.size = NSSize(width: 32, height: 32)
+                allApps.append(AppEntry(name: name, path: path, icon: icon))
+            }
+        }
+
         // Deduplicate by name (prefer /Applications over /System/Applications)
         var seen = Set<String>()
         allApps = allApps.filter { seen.insert($0.name).inserted }
@@ -278,6 +291,15 @@ class SwitcherPanel: NSPanel {
     func show() {
         searchField.stringValue = ""
         searchChanged()
+
+        // Re-center on screen each time
+        if let screen = NSScreen.main {
+            let screenFrame = screen.visibleFrame
+            let x = screenFrame.midX - frame.width / 2
+            let y = screenFrame.midY - frame.height / 2
+            setFrameOrigin(NSPoint(x: x, y: y))
+        }
+
         makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         makeFirstResponder(searchField)
